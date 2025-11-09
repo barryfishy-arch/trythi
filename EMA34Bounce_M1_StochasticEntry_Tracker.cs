@@ -53,6 +53,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         private double shortExtremePrice_M30 = double.MaxValue;
         private int shortLowestBarIndex_M30 = 0;
 
+        // M30 Extreme break handling flags
+        private bool longTriggerAttempted_M30 = false;
+        private bool shortTriggerAttempted_M30 = false;
+
         private int bounceCounter = 0;
 
         #endregion
@@ -313,6 +317,40 @@ namespace NinjaTrader.NinjaScript.Strategies
                 {
                     hasEMAHighTouched_M30 = true;
                 }
+
+                // Extreme break handling during pullback
+                if (currentHigh > longExtremePrice_M30)
+                {
+                    bool shouldResetToPhase1 = false;
+
+                    if (!longTriggerAttempted_M30)
+                    {
+                        // No trigger attempted yet - reset to Phase 1 with new extreme
+                        shouldResetToPhase1 = true;
+                    }
+                    else
+                    {
+                        // Trigger already attempted - just update extreme, don't reset
+                        // This allows continuation patterns after failed triggers
+                        shouldResetToPhase1 = false;
+                    }
+
+                    if (shouldResetToPhase1)
+                    {
+                        // Reset to Phase 1: new uptrend with higher high
+                        isInLongPullbackPhase_M30 = false;
+                        hasEMAHighTouched_M30 = false;
+                        longTriggerAttempted_M30 = false;
+                        longExtremePrice_M30 = currentHigh;
+                        longHighestBarIndex_M30 = CurrentBars[1];
+                    }
+                    else
+                    {
+                        // Just update the extreme, stay in pullback phase
+                        longExtremePrice_M30 = currentHigh;
+                        longHighestBarIndex_M30 = CurrentBars[1];
+                    }
+                }
             }
 
             // Phase 3: Entry trigger - CREATE M1 TRACKING
@@ -333,6 +371,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                 if (aboveSMA5 && aboveWave && minBarsCheck)
                 {
+                    // Mark that we're attempting a trigger for this pullback
+                    longTriggerAttempted_M30 = true;
+
                     bounceCounter++;
                     string bounceID = $"LONG_{bounceCounter}";
 
@@ -361,6 +402,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     hasEMAHighTouched_M30 = false;
                     longExtremePrice_M30 = 0;
                     longHighestBarIndex_M30 = 0;
+                    longTriggerAttempted_M30 = false;
                 }
             }
         }
@@ -404,6 +446,40 @@ namespace NinjaTrader.NinjaScript.Strategies
                 {
                     hasEMALowTouched_M30 = true;
                 }
+
+                // Extreme break handling during pullback
+                if (currentLow < shortExtremePrice_M30)
+                {
+                    bool shouldResetToPhase1 = false;
+
+                    if (!shortTriggerAttempted_M30)
+                    {
+                        // No trigger attempted yet - reset to Phase 1 with new extreme
+                        shouldResetToPhase1 = true;
+                    }
+                    else
+                    {
+                        // Trigger already attempted - just update extreme, don't reset
+                        // This allows continuation patterns after failed triggers
+                        shouldResetToPhase1 = false;
+                    }
+
+                    if (shouldResetToPhase1)
+                    {
+                        // Reset to Phase 1: new downtrend with lower low
+                        isInShortPullbackPhase_M30 = false;
+                        hasEMALowTouched_M30 = false;
+                        shortTriggerAttempted_M30 = false;
+                        shortExtremePrice_M30 = currentLow;
+                        shortLowestBarIndex_M30 = CurrentBars[1];
+                    }
+                    else
+                    {
+                        // Just update the extreme, stay in pullback phase
+                        shortExtremePrice_M30 = currentLow;
+                        shortLowestBarIndex_M30 = CurrentBars[1];
+                    }
+                }
             }
 
             // Phase 3: Entry trigger - CREATE M1 TRACKING
@@ -424,6 +500,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                 if (belowSMA5 && belowWave && minBarsCheck)
                 {
+                    // Mark that we're attempting a trigger for this pullback
+                    shortTriggerAttempted_M30 = true;
+
                     bounceCounter++;
                     string bounceID = $"SHORT_{bounceCounter}";
 
@@ -452,6 +531,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     hasEMALowTouched_M30 = false;
                     shortExtremePrice_M30 = double.MaxValue;
                     shortLowestBarIndex_M30 = 0;
+                    shortTriggerAttempted_M30 = false;
                 }
             }
         }
