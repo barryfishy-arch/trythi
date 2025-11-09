@@ -436,6 +436,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                     Print($"✅ [{bounceID}] M30 SHORT Bounce @ {bounce.M30BounceTime:HH:mm} Price: {bounce.M30BouncePrice:F5}");
 
+                    // Draw triangle on chart for visual verification
+                    Draw.TriangleDown(this, "ShortBounce_" + bounceCounter, false, Times[1][0], Highs[1][0] + (5 * TickSize), Brushes.Red);
+
                     // Reset for next setup
                     hasEMALowTouched_M30 = false;
                 }
