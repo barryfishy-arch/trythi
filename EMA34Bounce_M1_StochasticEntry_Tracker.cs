@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using NinjaTrader.Cbi;
 using NinjaTrader.Data;
+using NinjaTrader.Gui;
+using NinjaTrader.NinjaScript.DrawingTools;
 using NinjaTrader.NinjaScript.Indicators;
 #endregion
 
