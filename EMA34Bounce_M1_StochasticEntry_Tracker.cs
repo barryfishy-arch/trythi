@@ -355,8 +355,12 @@ namespace NinjaTrader.NinjaScript.Strategies
                     // Draw triangle on chart for visual verification
                     Draw.TriangleUp(this, "LongBounce_" + bounceCounter, false, Times[1][0], Lows[1][0] - (5 * TickSize), Brushes.Green);
 
-                    // Reset for next setup
+                    // Reset ALL state variables for next setup
+                    barsAboveEMAHigh_M30 = 0;
+                    isInLongPullbackPhase_M30 = false;
                     hasEMAHighTouched_M30 = false;
+                    longExtremePrice_M30 = 0;
+                    longHighestBarIndex_M30 = 0;
                 }
             }
         }
@@ -442,8 +446,12 @@ namespace NinjaTrader.NinjaScript.Strategies
                     // Draw triangle on chart for visual verification
                     Draw.TriangleDown(this, "ShortBounce_" + bounceCounter, false, Times[1][0], Highs[1][0] + (5 * TickSize), Brushes.Red);
 
-                    // Reset for next setup
+                    // Reset ALL state variables for next setup
+                    barsBelowEMALow_M30 = 0;
+                    isInShortPullbackPhase_M30 = false;
                     hasEMALowTouched_M30 = false;
+                    shortExtremePrice_M30 = double.MaxValue;
+                    shortLowestBarIndex_M30 = 0;
                 }
             }
         }
